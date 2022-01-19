@@ -1,17 +1,16 @@
 import HttpStatus from 'http-status-codes';
 
 import { ValidationError  } from 'express-validator';
+import { CustomError  } from './custom-error';
 
-export class RequestValidationError extends Error {
+export class RequestValidationError extends CustomError {
   statusCode: number = HttpStatus.BAD_REQUEST;
 
   constructor(public errors: ValidationError[]) {
-    super();
+    super('Invalid request parameters');
 
     Object.setPrototypeOf(this, RequestValidationError.prototype);
   }
 
-  serializeErrors() {
-    return this.errors.map(({ msg, param }) => ({ message: msg, field: param }));   
-  }
+  serializeErrors = () => this.errors.map(({ msg, param }) => ({ message: msg, field: param }));
 }

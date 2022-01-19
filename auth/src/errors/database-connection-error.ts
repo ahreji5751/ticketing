@@ -1,16 +1,15 @@
 import HttpStatus from 'http-status-codes';
 
-export class DatabaseConnectionError extends Error {
-  reason: string = 'Error connection to database';
+import { CustomError } from './custom-error';
+
+export class DatabaseConnectionError extends CustomError {
   statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR;
 
   constructor() {
-    super();
+    super('Error connecting to db');
 
     Object.setPrototypeOf(this, DatabaseConnectionError.prototype)
   }
 
-  serializeErrors() {
-    return [{ message: this.reason }];   
-  }
+  serializeErrors = () => [{ message: 'Error connection to database' }];   
 }
