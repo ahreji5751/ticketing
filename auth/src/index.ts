@@ -1,4 +1,6 @@
 import express, { Express } from 'express';
+import 'express-async-errors';
+
 import mongoose from 'mongoose';
 
 import { json } from 'body-parser';
@@ -6,8 +8,6 @@ import { json } from 'body-parser';
 import { currentUserRouter, signInRouter, signOutRouter, signUpRouter } from './routes';
 import { errorHandler } from './middleware/error-handler';
 import { NotFoundError } from './errors/not-found-error';
-
-import 'express-async-errors';
 
 const app: Express = express();
 

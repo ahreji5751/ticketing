@@ -1,7 +1,11 @@
+import HttpStatus from 'http-status-codes';
+
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 
-import { RequestValidationError, DatabaseConnectionError } from '../errors';
+import User from '../models/user';
+
+import { RequestValidationError, BadRequestError } from '../errors';
 
 const router: Router = Router();
 
@@ -16,7 +20,7 @@ router.post(
       .isLength({ min: 4, max: 20 })
       .withMessage('Password must be between 4 and 20 characters')
   ],
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -25,11 +29,13 @@ router.post(
 
     const { email, password } = req.body;
 
-    console.log('Creating user...');
+    const existingUser = await User.findOne({ email });
 
-    throw new DatabaseConnectionError();
+    if (existingUser) {
+      throw new BadRequestError('Email in use')
+    }
 
-    res.send({});
+    res.status(HttpStatus.CREATED).send(await User.generate({ email, password }));
   }
 );
 
