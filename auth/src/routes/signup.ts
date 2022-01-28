@@ -32,10 +32,10 @@ router.post(
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      throw new BadRequestError('Email in use')
+      throw new BadRequestError('Email in use');
     }
 
-    res.status(HttpStatus.CREATED).send(await User.generate({ email, password }));
+    res.status(HttpStatus.CREATED).send(await User.build({ email, password }));
   }
 );
 

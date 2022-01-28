@@ -1,12 +1,14 @@
 import { model, Schema, Model, Document } from 'mongoose';
 
+import Password from '../services/password';
+
 interface IUser {
   email: string;
   password: string;
 }
 
 interface UserModel extends Model<UserDoc> {
-  generate(attrs: IUser): UserDoc; 
+  new(attrs: IUser): UserDoc; 
   build(attrs: IUser): UserDoc; 
 }
 
@@ -26,8 +28,15 @@ const schema = new Schema({
   }
 });
 
-schema.statics.build = (user: IUser) => new User(user);
-schema.statics.generate = (user: IUser) => User.create(user);
+schema.pre('save', async function(done) {
+  if (this.isModified('password')) {
+    this.set('password', await Password.toHash(this.get('password')))
+  }
+  done();
+});
+
+schema.statics.new = (user: IUser) => new User(user);
+schema.statics.build = (user: IUser) => User.create(user);
 
 const User = model<UserDoc, UserModel>('User', schema);
 
