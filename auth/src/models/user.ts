@@ -30,7 +30,7 @@ const schema = new Schema({
 
 schema.pre('save', async function(done) {
   if (this.isModified('password')) {
-    this.set('password', await Password.toHash(this.get('password')))
+    this.set('password', await Password.toHash(this.get('password')));
   }
   done();
 });
