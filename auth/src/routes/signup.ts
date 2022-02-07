@@ -1,4 +1,5 @@
 import HttpStatus from 'http-status-codes';
+import jwt from 'jsonwebtoken';
 
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
@@ -35,7 +36,13 @@ router.post(
       throw new BadRequestError('Email in use');
     }
 
-    res.status(HttpStatus.CREATED).send(await User.build({ email, password }));
+    const user = await User.build({ email, password });
+
+    const userJwt = jwt.sign({ id: user.id, email: user.email }, 'asdf');
+
+    req.session!.jwt = userJwt;    
+
+    res.status(HttpStatus.CREATED).send(user);
   }
 );
 

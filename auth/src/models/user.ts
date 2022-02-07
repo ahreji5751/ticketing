@@ -9,7 +9,7 @@ interface IUser {
 
 interface UserModel extends Model<UserDoc> {
   new(attrs: IUser): UserDoc; 
-  build(attrs: IUser): UserDoc; 
+  build(attrs: IUser): Promise<UserDoc>; 
 }
 
 interface UserDoc extends Document {
