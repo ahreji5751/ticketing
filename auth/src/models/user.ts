@@ -26,6 +26,15 @@ const schema = new Schema({
     type: String,
     required: true
   }
+}, {
+  toJSON: {
+    transform(_, ret) {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.password;
+    },
+    versionKey: false
+  }
 });
 
 schema.pre('save', async function(done) {
