@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
+import request from 'supertest';
+import HttpStatus from 'http-status-codes';
 
-import {  MongoMemoryServer } from 'mongodb-memory-server';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 import { app } from '../app';
 
@@ -26,3 +28,12 @@ afterAll(async () => {
   await mongo.stop();
   await mongoose.connection.close();
 });
+
+global.signin = async () =>
+  (
+    await request(app)
+      .post('/api/users/signup')
+      .send({ email: 'test@test.com', password: '123456' })
+      .expect(HttpStatus.CREATED)
+  )
+  .get('Set-Cookie');
