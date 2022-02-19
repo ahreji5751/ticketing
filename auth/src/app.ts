@@ -4,10 +4,9 @@ import 'express-async-errors';
 import cookieSession from 'cookie-session';
 
 import { json } from 'body-parser';
+import { errorHandler, NotFoundError } from '@ahreji-tickets/common';
 
 import { currentUserRouter, signInRouter, signOutRouter, signUpRouter } from './routes';
-import { errorHandler } from './middleware/error-handler';
-import { NotFoundError } from './errors/not-found-error';
 
 const app: Express = express();
 

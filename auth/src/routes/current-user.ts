@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
-
-import { currentUser } from '../middleware/current-user';
+import { currentUser } from '@ahreji-tickets/common';
 
 const router: Router = Router();
 

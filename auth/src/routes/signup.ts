@@ -3,11 +3,9 @@ import jwt from 'jsonwebtoken';
 
 import { Router, Request, Response } from 'express';
 import { body } from 'express-validator';
+import { validateRequest, BadRequestError } from '@ahreji-tickets/common';
 
 import User from '../models/user';
-
-import { BadRequestError } from '../errors';
-import { validateRequest } from '../middleware/validate-request';
 
 const router: Router = Router();
 
