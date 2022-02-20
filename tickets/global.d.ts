@@ -1,0 +1,1 @@
+function signin(): Promise<string[]>;
