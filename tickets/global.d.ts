@@ -1,1 +1,1 @@
-function signin(): Promise<string[]>;
+function cookie(): string[];

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
 import HttpStatus from 'http-status-codes';
+import jwt from 'jsonwebtoken';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
@@ -29,11 +30,9 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-global.signin = async () =>
-  (
-    await request(app)
-      .post('/api/users/signup')
-      .send({ email: 'test@test.com', password: '123456' })
-      .expect(HttpStatus.CREATED)
-  )
-  .get('Set-Cookie');
+global.cookie = () => {
+  const session = { jwt: jwt.sign({ id: 'fsdfsdfs', email: 'test@test.com'}, process.env.JWT_KEY!) };
+  const jsonSession = JSON.stringify(session);
+
+  return [`session=${Buffer.from(jsonSession).toString('base64')}`];
+}
