@@ -30,8 +30,9 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-global.cookie = () => {
-  const session = { jwt: jwt.sign({ id: 'fsdfsdfs', email: 'test@test.com'}, process.env.JWT_KEY!) };
+global.cookie = (userId?: string) => {
+  const id = new mongoose.Types.ObjectId().toHexString();
+  const session = { jwt: jwt.sign({ id: userId || id, email: 'test@test.com'}, process.env.JWT_KEY!) };
   const jsonSession = JSON.stringify(session);
 
   return [`session=${Buffer.from(jsonSession).toString('base64')}`];

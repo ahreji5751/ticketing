@@ -6,7 +6,7 @@ import cookieSession from 'cookie-session';
 import { json } from 'body-parser';
 import { errorHandler, NotFoundError, currentUser } from '@ahreji-tickets/common';
 
-import { createTicketRouter } from './routes';
+import { createTicketRouter, showTicketRouter, indexTicketRouter, updateTicketRouter } from './routes';
 
 const app: Express = express();
 
@@ -17,6 +17,9 @@ app.use(cookieSession({ signed: false, secure: app.get('env') !== 'test' }));
 app.use(currentUser);
 
 app.use(createTicketRouter);
+app.use(showTicketRouter);
+app.use(indexTicketRouter);
+app.use(updateTicketRouter);
 
 app.all('*', async (req, res, next) => {
   throw new NotFoundError();

@@ -1,6 +1,8 @@
 import request from 'supertest';
 import HttpStatus from 'http-status-codes';
 
+import Ticket from '../../models/ticket';
+
 import { app } from '../../app';
 
 it('has a route handler listening to /api/tickets for post request', async () => {
@@ -56,9 +58,19 @@ it('returns an error if an invalid price is provided', async () => {
 });
 
 it('create a ticket with valid inputs', async () => {
+  const ticket = { title: 'test', price: 20 };
+
+  let tickets = await Ticket.find();
+  expect(tickets.length).toEqual(0);
+
   await request(app)
     .post('/api/tickets')
     .set('Cookie', cookie())
-    .send({ title: 'test', price: 20 })
-    .expect(HttpStatus.CREATED)
+    .send(ticket)
+    .expect(HttpStatus.CREATED);
+  
+  tickets = await Ticket.find();
+  expect(tickets.length).toEqual(1);
+  expect(tickets[0].price).toEqual(ticket.price);
+  expect(tickets[0].title).toEqual(ticket.title);
 });

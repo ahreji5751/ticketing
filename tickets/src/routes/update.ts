@@ -1,14 +1,14 @@
 import HttpStatus from 'http-status-codes';
 
 import { Router, Request, Response } from 'express';
-import { requireAuth, validateRequest } from '@ahreji-tickets/common';
+import { NotFoundError, validateRequest, requireAuth, NotAuthorizedError } from '@ahreji-tickets/common';
 import { body } from 'express-validator';
 
 import Ticket from '../models/ticket';
 
 const router: Router = Router();
 
-router.post('/api/tickets', 
+router.put('/api/tickets/:id', 
   requireAuth, 
   [
     body('title').not().isEmpty().withMessage('Title is required'),
@@ -16,11 +16,20 @@ router.post('/api/tickets',
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { title, price } = req.body;
+    const ticket = await Ticket.findById(req.params.id);
 
-    const ticket = await Ticket.build({ title, price, userId: req.currentUser!.id });
+    if (!ticket) {
+      throw new NotFoundError();
+    }
 
-    res.status(HttpStatus.CREATED).send(ticket);
+    if (ticket.userId !== req.currentUser.id) {
+      throw new NotAuthorizedError();
+    }
+
+    ticket.set({ title: req.body.title, price: req.body.price });
+    await ticket.save();
+
+    res.send(ticket);
   }
 );
 

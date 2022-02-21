@@ -1,1 +1,1 @@
-function cookie(): string[];
+function cookie(userId?: string): string[];
