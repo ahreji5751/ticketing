@@ -14,12 +14,12 @@ it('returns a nod found status if the ticket is not found', async () =>
     .expect(HttpStatus.NOT_FOUND)
 );
 
-it('returns not authenticated status if user is not authenticated', async () => {
+it('returns not authenticated status if user is not authenticated', async () => 
   request(app)
     .put(`/api/tickets/${new mongoose.Types.ObjectId().toHexString()}`)
     .send({ title: 'test', price: 10 })
     .expect(HttpStatus.UNAUTHORIZED)
-});
+);
 
 it('returns not authenticated status if user does not own this ticket', async () => {
   const tiket = await Ticket.build({ 
