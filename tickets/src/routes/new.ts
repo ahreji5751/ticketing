@@ -3,6 +3,7 @@ import HttpStatus from 'http-status-codes';
 import { Router, Request, Response } from 'express';
 import { requireAuth, validateRequest } from '@ahreji-tickets/common';
 import { body } from 'express-validator';
+import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
 
 import Ticket from '../models/ticket';
 
@@ -19,6 +20,13 @@ router.post('/api/tickets',
     const { title, price } = req.body;
 
     const ticket = await Ticket.build({ title, price, userId: req.currentUser!.id });
+
+    await new TicketCreatedPublisher(client).publish({
+      id: ticket.id,
+      tittle: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId
+    });
 
     res.status(HttpStatus.CREATED).send(ticket);
   }
