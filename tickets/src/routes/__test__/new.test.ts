@@ -4,6 +4,7 @@ import HttpStatus from 'http-status-codes';
 import Ticket from '../../models/ticket';
 
 import { app } from '../../app';
+import { natsWrapper } from '../../nats-wrapper';
 
 it('has a route handler listening to /api/tickets for post request', async () => {
   const response = await request(app)
@@ -73,4 +74,16 @@ it('create a ticket with valid inputs', async () => {
   expect(tickets.length).toEqual(1);
   expect(tickets[0].price).toEqual(ticket.price);
   expect(tickets[0].title).toEqual(ticket.title);
+});
+
+it('publishes an event', async () => {
+  const ticket = { title: 'test', price: 20 };
+
+  await request(app)
+    .post('/api/tickets')
+    .set('Cookie', cookie())
+    .send(ticket)
+    .expect(HttpStatus.CREATED);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled(); 
 });

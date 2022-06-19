@@ -5,6 +5,7 @@ import HttpStatus from 'http-status-codes';
 import Ticket from '../../models/ticket';
 
 import { app } from '../../app';
+import { natsWrapper } from '../../nats-wrapper';
 
 it('returns a nod found status if the ticket is not found', async () =>
   request(app)
@@ -75,4 +76,21 @@ it('updates the ticket provided valid inputs', async () => {
   expect(updatedTicket).not.toBeNull();
   expect(updatedTicket!.title).toEqual('new title');
   expect(updatedTicket!.price).toEqual(100);
+});
+
+it('publishes an event', async () => {
+  const userId = new mongoose.Types.ObjectId().toHexString();
+  const tiket = await Ticket.build({ 
+    title: 'Concert', 
+    price: 20, 
+    userId
+  });
+
+  await request(app)
+    .put(`/api/tickets/${tiket.id}`)
+    .set('Cookie', cookie(userId))
+    .send({ title: 'new title', price: 100 })
+    .expect(HttpStatus.OK);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled(); 
 });

@@ -1,11 +1,9 @@
 import mongoose from 'mongoose';
-import request from 'supertest';
-import HttpStatus from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-import { app } from '../app';
+jest.mock('../nats-wrapper');
 
 let mongo: any;
 beforeAll(async () => {
@@ -18,6 +16,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  jest.clearAllMocks();
   const collections = await mongoose.connection.db.collections();
 
   collections.forEach(async collection => {
