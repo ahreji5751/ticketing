@@ -1,7 +1,7 @@
 import HttpStatus from 'http-status-codes';
 
 import { Router, Request, Response } from 'express';
-import { BadRequestError, NotFoundError, OrderStatus, requireAuth, validateRequest, BadRequestError } from '@ahreji-tickets/common';
+import { BadRequestError, NotFoundError, OrderStatus, requireAuth, validateRequest } from '@ahreji-tickets/common';
 import { body } from 'express-validator';
 
 // import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
