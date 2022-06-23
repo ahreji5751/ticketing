@@ -1,4 +1,5 @@
 import HttpStatus from 'http-status-codes';
+import moment from 'moment';
 
 import { Router, Request, Response } from 'express';
 import { BadRequestError, NotFoundError, OrderStatus, requireAuth, validateRequest } from '@ahreji-tickets/common';
@@ -11,6 +12,8 @@ import Ticket from '../models/ticket';
 import Order from '../models/order';
 
 const router: Router = Router();
+
+const EXPIRATION_WINDOW_MINUTES = 15;
 
 router.post('/api/orders', 
   requireAuth, 
@@ -26,19 +29,17 @@ router.post('/api/orders',
       throw new NotFoundError();
     }
 
-    const existingOrder = await Order.findOne({
-      ticket: ticket,
-      status: {
-        $in: [
-          OrderStatus.Created, 
-          OrderStatus.AwaitingPayment, 
-          OrderStatus.Complete
-        ]
-      }
-    });
-    if (existingOrder) {
+    const isReserved = await ticket.isReserved();
+    if (isReserved) {
       throw new BadRequestError('Ticket is already reserved');
     }
+
+    const order = await Order.build({
+      userId: req.currentUser!.id,
+      status: OrderStatus.Created,
+      expiresAt: moment().add(EXPIRATION_WINDOW_MINUTES, 'minutes').toDate(),
+      ticket
+    });
 
     /* await new TicketCreatedPublisher(natsWrapper.client).publish({
       id: ticket.id,
@@ -47,7 +48,7 @@ router.post('/api/orders',
       userId: ticket.userId
     }); */
 
-    res.status(HttpStatus.CREATED).send({});
+    res.status(HttpStatus.CREATED).send(order);
   }
 );
 

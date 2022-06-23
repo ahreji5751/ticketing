@@ -3,6 +3,8 @@ import { OrderStatus } from '@ahreji-tickets/common';
 
 import { TicketDoc } from './ticket';
 
+export { OrderStatus };
+
 interface IOrder {
   userId: string;
   status: OrderStatus;
