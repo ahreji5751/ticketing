@@ -1,19 +1,24 @@
 import { Router, Request, Response } from 'express';
-import { NotFoundError } from '@ahreji-tickets/common';
+import { NotAuthorizedError, NotFoundError, requireAuth } from '@ahreji-tickets/common';
 
-// import Ticket from '../models/ticket';
+import Order from '../models/order';
 
 const router: Router = Router();
 
-router.get('/api/orders/:id', 
+router.get('/api/orders/:orderId', 
+  requireAuth,
   async (req: Request, res: Response) => {
-   /*  const ticket = await Ticket.findById(req.params.id);
+    const order = await Order.findById(req.params.orderId).populate('ticket');
 
-    if (!ticket) {
+    if (!order) {
       throw new NotFoundError();
-    } */
+    }
 
-    res.send({});
+    if (order.userId !== req.currentUser!.id) {
+      throw new NotAuthorizedError();
+    }
+
+    res.send(order);
   }
 );
 
