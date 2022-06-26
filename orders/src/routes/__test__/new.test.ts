@@ -76,14 +76,14 @@ it('creates an order with valid inputs', async () => {
     .expect(HttpStatus.CREATED);
 });
 
-/* it('publishes an event', async () => {
-  const ticket = { title: 'test', price: 20 };
+it('publishes an event', async () => {
+  const ticket = await Ticket.build({ title: 'Concert', price: 20 });
 
   await request(app)
-    .post('/api/tickets')
+    .post('/api/orders')
     .set('Cookie', cookie())
-    .send(ticket)
+    .send({ ticketId: ticket.id })
     .expect(HttpStatus.CREATED);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled(); 
-}); */
+});

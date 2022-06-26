@@ -54,19 +54,20 @@ it('successfully deletes an order', async () => {
   expect(cancelledOrder!.status).toEqual(OrderStatus.Cancelled);
 });
 
-/* it('publishes an event', async () => {
-  const userId = new mongoose.Types.ObjectId().toHexString();
-  const tiket = await Ticket.build({ 
-    title: 'Concert', 
-    price: 20, 
-    userId
-  });
+it('publishes an event', async () => {
+  const user = cookie();
+
+  const { body: order } = await request(app)
+    .post(`/api/orders`)
+    .set('Cookie', user)
+    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20 })).id })
+    .expect(HttpStatus.CREATED);
 
   await request(app)
-    .put(`/api/tickets/${tiket.id}`)
-    .set('Cookie', cookie(userId))
-    .send({ title: 'new title', price: 100 })
-    .expect(HttpStatus.OK);
+    .delete(`/api/orders/${order.id}`)
+    .set('Cookie', user)
+    .send()
+    .expect(HttpStatus.NO_CONTENT);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled(); 
-}); */
+});

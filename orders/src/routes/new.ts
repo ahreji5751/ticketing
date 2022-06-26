@@ -5,7 +5,7 @@ import { Router, Request, Response } from 'express';
 import { BadRequestError, NotFoundError, OrderStatus, requireAuth, validateRequest } from '@ahreji-tickets/common';
 import { body } from 'express-validator';
 
-// import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
+import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
 
 import Ticket from '../models/ticket';
@@ -41,12 +41,16 @@ router.post('/api/orders',
       ticket
     });
 
-    /* await new TicketCreatedPublisher(natsWrapper.client).publish({
-      id: ticket.id,
-      tittle: ticket.title,
-      price: ticket.price,
-      userId: ticket.userId
-    }); */
+    await new OrderCreatedPublisher(natsWrapper.client).publish({
+      id: order.id,
+      status: order.status,
+      userId: order.userId,
+      expiresAt: order.expiresAt.toISOString(),
+      ticket: {
+        id: ticket.id,
+        price: ticket.price  
+      }
+    });
 
     res.status(HttpStatus.CREATED).send(order);
   }

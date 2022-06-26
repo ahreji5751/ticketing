@@ -5,7 +5,7 @@ import { NotFoundError, requireAuth, NotAuthorizedError } from '@ahreji-tickets/
 
 import Order, { OrderStatus } from '../models/order';
 
-// import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher';
+import { OrderCancelledPublisher } from '../events/publishers/order-cancelled-publisher';
 import { natsWrapper } from '../nats-wrapper';
 
 const router: Router = Router();
@@ -13,7 +13,7 @@ const router: Router = Router();
 router.delete('/api/orders/:orderId', 
   requireAuth, 
   async (req: Request, res: Response) => {
-    const order = await Order.findById(req.params.orderId);
+    const order = await Order.findById(req.params.orderId).populate('ticket');
 
     if (!order) {
       throw new NotFoundError();
@@ -26,12 +26,12 @@ router.delete('/api/orders/:orderId',
     order.status = OrderStatus.Cancelled;
     await order.save();
 
-    /* await new TicketUpdatedPublisher(natsWrapper.client).publish({
-      id: ticket.id,
-      tittle: ticket.title,
-      price: ticket.price,
-      userId: ticket.userId
-    }); */
+    await new OrderCancelledPublisher(natsWrapper.client).publish({
+      id: order.id,
+      ticket: {
+        id: order.ticket.id
+      }
+    });
 
     res.status(HttpStatus.NO_CONTENT).send();
   }
