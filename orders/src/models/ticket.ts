@@ -1,4 +1,5 @@
 import { model, Schema, Model, Document } from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 import Order, { OrderStatus } from './order';
 
@@ -11,11 +12,13 @@ interface ITicket {
 interface TicketModel extends Model<TicketDoc> {
   new(attrs: ITicket): TicketDoc; 
   build(attrs: ITicket): Promise<TicketDoc>;
+  findByIdUsingVersion(filter: { id: string, version: number }): Promise<TicketDoc|null>;
 }
 
 export interface TicketDoc extends Document {
   title: string;
   price: number;
+  version: number;
   isReserved: () => Promise<boolean>;
 }
 
@@ -36,11 +39,15 @@ const schema = new Schema({
       delete ret._id;
     },
     versionKey: false
-  }
+  },
+  versionKey: 'version'
 });
+
+schema.plugin(updateIfCurrentPlugin);
 
 schema.statics.new = (ticket: ITicket) => new Ticket(ticket);
 schema.statics.build = (ticket: ITicket) => Ticket.create({ _id: ticket.id, ...ticket });
+schema.statics.findByIdUsingVersion = ({ id, version }: { id: string, version: number }) => Ticket.findOne({ _id: id, version: version - 1 });
 schema.methods.isReserved = async function() {
   const existingOrder = await Order.findOne({
     ticket: this,
@@ -52,6 +59,22 @@ schema.methods.isReserved = async function() {
       ]
     }
   });
+  
+
+  return !!existingOrder;
+};
+schema.methods.isReserved = async function() {
+  const existingOrder = await Order.findOne({
+    ticket: this,
+    status: {
+      $in: [
+        OrderStatus.Created, 
+        OrderStatus.AwaitingPayment, 
+        OrderStatus.Complete
+      ]
+    }
+  });
+  
 
   return !!existingOrder;
 };

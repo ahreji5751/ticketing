@@ -1,5 +1,6 @@
 import { model, Schema, Model, Document } from 'mongoose';
 import { OrderStatus } from '@ahreji-tickets/common';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 import { TicketDoc } from './ticket';
 
@@ -22,6 +23,7 @@ interface OrderDoc extends Document {
   status: OrderStatus;
   expiresAt: Date;
   ticket: TicketDoc;
+  version: number;
 }
 
 const schema = new Schema({
@@ -49,8 +51,11 @@ const schema = new Schema({
       delete ret._id;
     },
     versionKey: false
-  }
+  },
+  versionKey: 'version'
 });
+
+schema.plugin(updateIfCurrentPlugin);
 
 schema.statics.new = (order: IOrder) => new Order(order);
 schema.statics.build = (order: IOrder) => Order.create(order);
