@@ -25,7 +25,7 @@ it('returns not authenticated status if user does not own this order', async () 
   const { body: order } = await request(app)
     .post(`/api/orders`)
     .set('Cookie', cookie())
-    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20 })).id })
+    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20, id: new mongoose.Types.ObjectId().toHexString() })).id })
     .expect(HttpStatus.CREATED);
 
   await request(app)
@@ -41,7 +41,7 @@ it('successfully deletes an order', async () => {
   const { body: order } = await request(app)
     .post(`/api/orders`)
     .set('Cookie', user)
-    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20 })).id })
+    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20, id: new mongoose.Types.ObjectId().toHexString() })).id })
     .expect(HttpStatus.CREATED);
 
   await request(app)
@@ -60,7 +60,7 @@ it('publishes an event', async () => {
   const { body: order } = await request(app)
     .post(`/api/orders`)
     .set('Cookie', user)
-    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20 })).id })
+    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20, id: new mongoose.Types.ObjectId().toHexString() })).id })
     .expect(HttpStatus.CREATED);
 
   await request(app)

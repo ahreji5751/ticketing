@@ -25,7 +25,7 @@ it('returns a not authorized status if user tries to access the order which is n
   const { body: order } = await request(app)
     .post(`/api/orders`)
     .set('Cookie', cookie())
-    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20 })).id })
+    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20, id: new mongoose.Types.ObjectId().toHexString() })).id })
     .expect(HttpStatus.CREATED);
 
   await request(app)
@@ -41,7 +41,7 @@ it('returns the ticket if the ticket is found', async () => {
   const { body: order } = await request(app)
     .post(`/api/orders`)
     .set('Cookie', user)
-    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20 })).id })
+    .send({ ticketId: (await Ticket.build({ title: 'Concert', price: 20, id: new mongoose.Types.ObjectId().toHexString() })).id })
     .expect(HttpStatus.CREATED);
 
   const { body: fetchedOrder } = await request(app)

@@ -1,11 +1,12 @@
 import request from 'supertest';
 import HttpStatus from 'http-status-codes';
+import mongoose from 'mongoose';
 
 import Ticket from '../../models/ticket';
 
 import { app } from '../../app';
 
-const buildTicket = async () => Ticket.build({ title: 'Concert', price: 20 });
+const buildTicket = async () => Ticket.build({ title: 'Concert', price: 20, id: new mongoose.Types.ObjectId().toHexString() });
 
 it('can fetch a list of orders', async () => {
   const ticketOne = await buildTicket();
