@@ -9,8 +9,8 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent, Subjects
   readonly subject = Subjects.TicketUpdated;
   queueGroupName = queueGroupName;
 
-  async onMessage(data: TicketUpdatedEvent, msg: Message) {
-    const { id, title, price, version } = data;
+  async onMessage(event: TicketUpdatedEvent, msg: Message) {
+    const { id, title, price, version } = event;
 
     const ticket = await Ticket.findByIdUsingVersion({ id, version });
 
