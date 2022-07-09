@@ -23,14 +23,14 @@ it('returns not authenticated status if user is not authenticated', async () =>
 );
 
 it('returns not authenticated status if user does not own this ticket', async () => {
-  const tiket = await Ticket.build({ 
+  const ticket = await Ticket.build({ 
     title: 'Concert', 
     price: 20, 
     userId: new mongoose.Types.ObjectId().toHexString() 
   });
 
   await request(app)
-    .put(`/api/tickets/${tiket.id}`)
+    .put(`/api/tickets/${ticket.id}`)
     .set('Cookie', cookie())
     .send({ title: 'new title', price: 100 })
     .expect(HttpStatus.UNAUTHORIZED)
@@ -38,20 +38,20 @@ it('returns not authenticated status if user does not own this ticket', async ()
 
 it('returns a bad request status if the user provides an invalid title or price', async () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tiket = await Ticket.build({ 
+  const ticket = await Ticket.build({ 
     title: 'Concert', 
     price: 20, 
     userId
   });
 
   await request(app)
-    .put(`/api/tickets/${tiket.id}`)
+    .put(`/api/tickets/${ticket.id}`)
     .set('Cookie', cookie(userId))
     .send({ title: '', price: 20 })
     .expect(HttpStatus.BAD_REQUEST);
   
   await request(app)
-    .put(`/api/tickets/${tiket.id}`)
+    .put(`/api/tickets/${ticket.id}`)
     .set('Cookie', cookie(userId))
     .send({ title: 'new title', price: -10 })
     .expect(HttpStatus.BAD_REQUEST);
@@ -59,19 +59,19 @@ it('returns a bad request status if the user provides an invalid title or price'
 
 it('updates the ticket provided valid inputs', async () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tiket = await Ticket.build({ 
+  const ticket = await Ticket.build({ 
     title: 'Concert', 
     price: 20, 
     userId
   });
 
   await request(app)
-    .put(`/api/tickets/${tiket.id}`)
+    .put(`/api/tickets/${ticket.id}`)
     .set('Cookie', cookie(userId))
     .send({ title: 'new title', price: 100 })
     .expect(HttpStatus.OK);
   
-  const updatedTicket = await Ticket.findById(tiket.id);
+  const updatedTicket = await Ticket.findById(ticket.id);
 
   expect(updatedTicket).not.toBeNull();
   expect(updatedTicket!.title).toEqual('new title');
@@ -80,17 +80,35 @@ it('updates the ticket provided valid inputs', async () => {
 
 it('publishes an event', async () => {
   const userId = new mongoose.Types.ObjectId().toHexString();
-  const tiket = await Ticket.build({ 
+  const ticket = await Ticket.build({ 
     title: 'Concert', 
     price: 20, 
     userId
   });
 
   await request(app)
-    .put(`/api/tickets/${tiket.id}`)
+    .put(`/api/tickets/${ticket.id}`)
     .set('Cookie', cookie(userId))
     .send({ title: 'new title', price: 100 })
     .expect(HttpStatus.OK);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled(); 
 });
+
+it('rejects updates if the ticket is reserved', async () => {
+  const userId = new mongoose.Types.ObjectId().toHexString();
+  const ticket = await Ticket.build({ 
+    title: 'Concert', 
+    price: 20, 
+    userId
+  });
+
+  ticket.orderId = new mongoose.Types.ObjectId().toHexString();
+  await ticket.save(); 
+
+  await request(app)
+    .put(`/api/tickets/${ticket.id}`)
+    .set('Cookie', cookie(userId))
+    .send({ title: 'new title', price: 100 })
+    .expect(HttpStatus.BAD_REQUEST);
+}); 

@@ -1,7 +1,7 @@
 import HttpStatus from 'http-status-codes';
 
 import { Router, Request, Response } from 'express';
-import { NotFoundError, validateRequest, requireAuth, NotAuthorizedError } from '@ahreji-tickets/common';
+import { NotFoundError, validateRequest, requireAuth, NotAuthorizedError, BadRequestError } from '@ahreji-tickets/common';
 import { body } from 'express-validator';
 
 import Ticket from '../models/ticket';
@@ -27,6 +27,10 @@ router.put('/api/tickets/:id',
 
     if (ticket.userId !== req.currentUser.id) {
       throw new NotAuthorizedError();
+    }
+
+    if (ticket.orderId) {
+      throw new BadRequestError('Ticket is reserved'); 
     }
 
     ticket.set({ title: req.body.title, price: req.body.price });
