@@ -1,3 +1,6 @@
+import moment from 'moment';
+
+import { OrderCreatedListener } from './events/listeners/order-created-listener';
 import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
@@ -12,6 +15,7 @@ const start = async () => {
   }
 
   try {
+    await new Promise<void>(resolve => setTimeout(() => resolve(), 5000));
     await natsWrapper.connect(process.env.NATS_CLUSTER_ID, process.env.NATS_CLIENT_ID, process.env.NATS_URL);
 
     natsWrapper.client.on('close', () => {
@@ -22,8 +26,7 @@ const start = async () => {
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
 
-    // new OrderCreatedListener(natsWrapper.client).listen();
-    // new OrderCancelledListener(natsWrapper.client).listen();
+    new OrderCreatedListener(natsWrapper.client).listen();
   } catch (e) {
     console.error(e);
   }

@@ -13,7 +13,7 @@ import Order from '../models/order';
 
 const router: Router = Router();
 
-const EXPIRATION_WINDOW_MINUTES = 15;
+const EXPIRATION_WINDOW_MINUTES = 1;
 
 router.post('/api/orders', 
   requireAuth, 

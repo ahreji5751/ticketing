@@ -17,9 +17,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ahreji-tickets/common": "^1.0.12",
+    "@ahreji-tickets/common": "^1.0.13",
     "@types/bull": "^3.15.8",
     "bull": "^4.8.4",
+    "moment": "^2.29.4",
     "node-nats-streaming": "^0.3.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.5.4"
