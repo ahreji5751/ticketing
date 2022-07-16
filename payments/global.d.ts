@@ -1,0 +1,1 @@
+function cookie(userId?: string): string[];
