@@ -1,5 +1,5 @@
 import { Message } from 'node-nats-streaming';
-import { Subjects, Listener, OrderCreatedEvent, OrderStatus } from '@ahreji-tickets/common';
+import { Subjects, Listener, OrderCreatedEvent } from '@ahreji-tickets/common';
 
 import Order from '../../models/order';
 
