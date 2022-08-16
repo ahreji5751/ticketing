@@ -5,6 +5,11 @@ import { NotFoundError, requireAuth, validateRequest, NotAuthorizedError, OrderS
 import { body } from 'express-validator';
 
 import Order from '../models/order';
+import Payment from '../models/payment';
+
+import { PaymentCreatedPublisher } from '../events/publishers/payment-created-publisher';
+import { stripe } from '../stripe';
+import { natsWrapper } from '../nats-wrapper';
 
 const router: Router = Router();
 
@@ -32,7 +37,21 @@ router.post('/api/payments',
       throw new BadRequestError('Order is cancelled');
     }
 
-    res.send({ success: true });
+    const charge = await stripe.charges.create({
+      currency: 'usd',
+      amount: order.price * 100,
+      source: token
+    });
+
+    const payment = await Payment.build({ orderId, stripeId: charge.id });
+
+    await new PaymentCreatedPublisher(natsWrapper.client).publish({
+      id: payment.id,
+      orderId: payment.orderId,
+      stripeId: payment.stripeId
+    });
+
+    res.status(HttpStatus.CREATED).send({ id: payment.id });
   }
 );
 

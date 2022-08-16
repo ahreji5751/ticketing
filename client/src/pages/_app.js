@@ -16,7 +16,7 @@ CustomApp.getInitialProps = async appContext => {
 
   const { data } = await client.get('api/users/currentuser');
 
-  const pageProps = await App.getInitialProps(appContext);
+  const pageProps = await App.getInitialProps(appContext, client);
 
   return { pageProps: { ...pageProps, ...data } };
 }

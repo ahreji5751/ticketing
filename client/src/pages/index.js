@@ -4,4 +4,8 @@ const LandingPage = ({ currentUser }) => {
   )
 }
 
+LandingPage.getInitialProps = async (context, client) => {
+  return {};
+}
+
 export default LandingPage;

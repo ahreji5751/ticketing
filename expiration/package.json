@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@ahreji-tickets/common": "^1.0.13",
+    "@ahreji-tickets/common": "^1.0.14",
     "@types/bull": "^3.15.8",
     "bull": "^4.8.4",
     "moment": "^2.29.4",

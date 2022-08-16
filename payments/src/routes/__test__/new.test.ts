@@ -2,10 +2,13 @@ import request from 'supertest';
 import HttpStatus from 'http-status-codes';
 import mongoose from 'mongoose';
 
+import { OrderStatus } from '@ahreji-tickets/common';
+
 import Order from '../../models/order';
+import Payment from '../../models/payment';
 
 import { app } from '../../app';
-import { OrderStatus } from '@ahreji-tickets/common';
+import { stripe } from '../../stripe';
 
 it('has a route handler listening to /api/payments for post request', async () => {
   const response = await request(app)
@@ -99,20 +102,26 @@ it('return a 400 when purchasing a cancelled order', async () => {
     .expect(HttpStatus.BAD_REQUEST);
 });
 
-/* it('create a chanre with valid inputs', async () => {
-  const ticket = { title: 'test', price: 20 };
-
-  let tickets = await Ticket.find();
-  expect(tickets.length).toEqual(0);
+it('returns CREATED with valid inputs', async () => {
+  const order = await Order.build({ 
+    id: new mongoose.Types.ObjectId().toHexString(),
+    userId: new mongoose.Types.ObjectId().toHexString(),
+    version: 0,
+    price: 20,
+    status: OrderStatus.Created
+  });
 
   await request(app)
     .post('/api/payments')
-    .set('Cookie', cookie())
-    .send(ticket)
+    .set('Cookie', cookie(order.userId))
+    .send({ token: 'tok_visa', orderId: order.id })
     .expect(HttpStatus.CREATED);
   
-  tickets = await Ticket.find();
-  expect(tickets.length).toEqual(1);
-  expect(tickets[0].price).toEqual(ticket.price);
-  expect(tickets[0].title).toEqual(ticket.title);
-}); */
+  const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0];
+  expect(chargeOptions.source).toEqual('tok_visa');
+  expect(chargeOptions.amount).toEqual(20 * 100);
+  expect(chargeOptions.currency).toEqual('usd');
+
+  const payment = await Payment.findOne({ orderId: order.id, stripeId: 'test' });
+  expect(payment).not.toBeNull();
+});

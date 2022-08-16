@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 jest.mock('../nats-wrapper');
+jest.mock('../stripe');
 
 let mongo: any;
 beforeAll(async () => {
