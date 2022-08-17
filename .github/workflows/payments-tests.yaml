@@ -1,0 +1,17 @@
+name: payments-tests
+
+on:
+  pull_request:
+    branches: [ "master" ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Tests
+        run: | 
+          cd payments
+          npm i
+          npm run test:ci
