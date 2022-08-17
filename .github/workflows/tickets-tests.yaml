@@ -12,6 +12,6 @@ jobs:
 
       - name: Tests
         run: | 
-          cd orders
+          cd tickets
           npm i
           npm run test:ci
