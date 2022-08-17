@@ -10,7 +10,7 @@ const AuthAction = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onSuccess = data => router.push('/');
+  const onSuccess = () => router.push('/');
 
   const { doRequest, errors } = useRequest({ url: `/api/users/${action}`, method: 'post', body: { email, password }, onSuccess });
 
