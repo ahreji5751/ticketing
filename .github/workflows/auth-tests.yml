@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Auth tests
+      - name: Tests
         run: | 
           cd auth
           npm i
