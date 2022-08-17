@@ -15,7 +15,7 @@ const start = async () => {
   }
 
   try {
-    await new Promise<void>(resolve => setTimeout(() => resolve(), 5000));
+    // await new Promise<void>(resolve => setTimeout(() => resolve(), 5000));
     await natsWrapper.connect(process.env.NATS_CLUSTER_ID, process.env.NATS_CLIENT_ID, process.env.NATS_URL);
 
     natsWrapper.client.on('close', () => {
