@@ -2,7 +2,6 @@ name: auth-tests
 
 on:
   pull_request:
-    branches: [ "master" ]
     paths: 
       - 'auth/**'
     
