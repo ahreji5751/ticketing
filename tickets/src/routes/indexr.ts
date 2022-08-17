@@ -6,7 +6,7 @@ import Ticket from '../models/ticket';
 const router: Router = Router();
 
 router.get('/api/tickets', 
-  async (req: Request, res: Response) => res.send(await Ticket.find())
+  async (req: Request, res: Response) => res.send(await Ticket.find({ orderId: undefined }))
 );
 
 export default router;

@@ -63,21 +63,6 @@ schema.methods.isReserved = async function() {
 
   return !!existingOrder;
 };
-schema.methods.isReserved = async function() {
-  const existingOrder = await Order.findOne({
-    ticket: this,
-    status: {
-      $in: [
-        OrderStatus.Created, 
-        OrderStatus.AwaitingPayment, 
-        OrderStatus.Complete
-      ]
-    }
-  });
-  
-
-  return !!existingOrder;
-};
 
 const Ticket = model<TicketDoc, TicketModel>('Ticket', schema);
 
