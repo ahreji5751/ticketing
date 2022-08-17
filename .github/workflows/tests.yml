@@ -1,0 +1,17 @@
+name: tests
+
+on:
+  pull_request:
+    branches: [ "master" ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Auth tests
+        run: | 
+          cd auth
+          npm i
+          npm run test:ci
